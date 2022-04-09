@@ -10,6 +10,7 @@ A list of useful .htaccess tricks to improve security of Wordpress sites
 - [Allow only selected IP addresses to access wp-admin](#allow-only-selected-ip-addresses-to-access-wp-admin)
 - [Deny image hotlinking](#deny-image-hotlinking)
 - [Redirect custom 404 page](#redirect-custom-404-page)
+- [Serve WebP images](#serve-webp-images)
 
 
 ## Disable directory browsing 
@@ -97,3 +98,14 @@ ErrorDocument 403 /error.html
 ErrorDocument 500 /error.html
 ```
 
+## Serve WebP images
+If WebP images are supported and an image with a .webp extension and the same name is found at the same place as the jpg/png image that is going to be served, then the WebP image is served instead.
+
+*If you want to convert all .png .jpg images use ImageMagick in Apache server*
+
+```php
+RewriteEngine On
+RewriteCond %{HTTP_ACCEPT} image/webp
+RewriteCond %{DOCUMENT_ROOT}/$1.webp -f
+RewriteRule (.+)\.(jpe?g|png)$ $1.webp [T=image/webp,E=accept:1]
+```
