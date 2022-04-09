@@ -7,6 +7,9 @@ A list of useful .htaccess tricks to improve security of Wordpress sites
 - [Ban suspicious IP Addresses](#ban-suspicious-ip-addresses)
 - [Disable access to XML-RPC file](#disable-access-to-xml-rpc-file)
 - [Block author enumeration in Wordpress](#block-author-enumeration-in-wordpress)
+- [Allow only selected IP addresses to access wp-admin](#allow-only-selected-ip-addresses-to-access-wp-admin)
+- [Deny image hotlinking](#deny-image-hotlinking)
+- [Redirect custom 404 page](#redirect-custom-404-page)
 
 
 ## Disable directory browsing 
@@ -58,5 +61,39 @@ RewriteBase /
 RewriteCond %{QUERY_STRING} (author=\d+) [NC]
 RewriteRule .* - [F]
 # END block author scans 
+```
+
+## Allow only selected IP addresses to access wp-admin
+The wp-admin folder contains the files required to run the WordPress dashboard. In most cases, your visitors don’t need access to the WordPress dashboard, unless they want to register an account. A good security measure is to enable only a few selected IP addresses to access the wp-admin folder. 
+
+**Remeber to add these lines into .htaccess file located into the /wp-admin/ folder and not into the root folder**
+
+```php
+# Limit logins and admin by IP
+<Limit GET POST PUT>
+order deny,allow
+deny from all
+allow from 302.143.54.102
+allow from IP_ADDRESS_2
+</Limit>
+```
+
+## Deny image hotlinking
+When someone uses your site’s image, your bandwidth is being consumed and most of the time, you’re not even credited for it. This code snippet eliminates that problem and sends this image when a hotlink is detected.
+```php
+# Prevent image hotlinking script. Replace last URL with any image link you want.
+RewriteEngine on
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?my_site.com [NC]
+RewriteCond %{HTTP_REFERER} !^http(s)?://(www\.)?my_site.com [NC]
+RewriteRule \.(jpg|jpeg|png|gif)$ http://i.imgur.com/MlQAH71.jpg [NC,R,L]
+```
+
+## Redirect custom 404 page
+```php
+# Custom error page for error 403, 404 and 500
+ErrorDocument 404 /error.html
+ErrorDocument 403 /error.html
+ErrorDocument 500 /error.html
 ```
 
